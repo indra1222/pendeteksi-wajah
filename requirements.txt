@@ -1,0 +1,4 @@
+opencv-python==4.8.0.74  # Versi terbaru OpenCV saat ini
+numpy==1.23.5            # Versi stabil terbaru dari numpy
+tensorflow==2.13.0       # Versi terbaru TensorFlow untuk mendukung library FER
+fer==22.4.0              # Library untuk deteksi ekspresi wajah (Facial Expression Recognition)
