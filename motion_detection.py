@@ -1,8 +1,11 @@
 import cv2
 import numpy as np
 from fer import FER  # Install dengan 'pip install fer'
+import streamlit as st
 
 def detect_motion_and_expression():
+    st.title("Motion and Emotion Detection")
+
     # Inisialisasi webcam
     cap = cv2.VideoCapture(0)  # 0 untuk webcam default
 
@@ -12,16 +15,19 @@ def detect_motion_and_expression():
     # Baca frame pertama
     ret, frame = cap.read()
     if not ret:
-        print("Gagal mengakses webcam.")
+        st.error("Gagal mengakses webcam.")
         return
 
     prev_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Stream video ke Streamlit
+    frame_placeholder = st.empty()
 
     while True:
         # Baca frame baru
         ret, frame = cap.read()
         if not ret:
-            print("Gagal membaca frame.")
+            st.error("Gagal membaca frame.")
             break
 
         # Konversi ke grayscale untuk deteksi gerakan
@@ -61,25 +67,23 @@ def detect_motion_and_expression():
             if score > 0.5:  # Threshold untuk confidence
                 cv2.putText(frame, f'{emotion}', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
 
-        # Jika gerakan terdeteksi, tampilkan teks 'Motion Detected'
-        if motion_detected:
-            cv2.putText(frame, "Motion Detected", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-
-        # Tampilkan frame
-        cv2.imshow("Motion and Emotion Detection", frame)
-
         # Update frame sebelumnya
         prev_frame = gray
 
-        # Tunggu sebentar dan cek apakah pengguna menekan 'q' untuk keluar
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        # Tampilkan frame pada Streamlit
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # Ubah dari BGR ke RGB
+        frame_placeholder.image(frame, channels="RGB")
+
+        # Jika ingin berhenti, kita bisa gunakan tombol 'q' atau perintah lainnya (sesuaikan dengan Streamlit)
+
+        # Berhenti jika tombol 'Stop' ditekan
+        if st.button("Stop"):
             break
 
     # Bersihkan
     cap.release()
-    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    print("Program deteksi gerakan dan ekspresi menggunakan webcam.")
-    print("Tekan 'q' untuk menghentikan program.")
-    detect_motion_and_expression()
+    st.sidebar.title("Control Panel")
+    if st.sidebar.button("Mulai Deteksi"):
+        detect_motion_and_expression()
